@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Shope in home{% endblock %}
+
+{% block content %}
+  <div class="auth-layout">
+    <section class="auth-intro">
+      <div class="auth-kicker">Create account</div>
+      <h1 class="auth-title">Join Shope in home</h1>
+      <p class="auth-subtitle">Create an account to track your orders and save your details for faster checkout.</p>
+    </section>
+
+    <section class="card form-card auth-card">
+      <h2 class="auth-form-title">Create Account</h2>
+
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-block">Register</button>
+      </form>
+
+      <div class="muted mt">
+        Already have an account?
+        <a class="link" href="{% url 'accounts:login' %}">Login</a>
+      </div>
+    </section>
+  </div>
+{% endblock %}

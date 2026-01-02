@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.order_code }} - Shope in home{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Order #{{ order.order_code }}</h1>
+
+  <div class="order-meta card">
+    <div><strong>Order ID:</strong> #{{ order.order_code }}</div>
+    <div><strong>Status:</strong> {{ order.get_status_display }}</div>
+    <div><strong>Payment:</strong> {{ order.get_payment_method_display }}</div>
+    {% if order.payment_method == 'MANUAL' and order.manual_payment_method %}
+      <div><strong>Option:</strong> {{ order.manual_payment_method.name }}</div>
+      {% if order.manual_payment_method.upi_id %}
+        <div><strong>UPI ID:</strong> {{ order.manual_payment_method.upi_id }}</div>
+      {% endif %}
+      {% if order.manual_payment_method.qr_image %}
+        <div><strong>QR:</strong> <a class="link" href="{{ order.manual_payment_method.qr_image.url }}" target="_blank" rel="noopener noreferrer">View</a></div>
+      {% endif %}
+    {% endif %}
+    {% if payment %}
+      <div><strong>Payment Status:</strong> {{ payment.get_status_display }}</div>
+      {% if payment.manual_reference %}
+        <div><strong>Reference:</strong> {{ payment.manual_reference }}</div>
+      {% endif %}
+      {% if payment.manual_proof %}
+        <div><strong>Proof:</strong> <a class="link" href="{{ payment.manual_proof.url }}" target="_blank" rel="noopener noreferrer">View</a></div>
+      {% endif %}
+    {% endif %}
+    <div><strong>Placed:</strong> {{ order.created_at|date:"d M Y, H:i" }}</div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Track Order</h2>
+    <div class="track-steps">
+      {% for step in tracking_steps %}
+        <div class="track-step{% if step.done %} done{% endif %}{% if step.current %} current{% endif %}{% if step.value == 'CANCELLED' %} cancelled{% endif %}">
+          <div class="track-dot"></div>
+          <div class="track-label">{{ step.label }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Delivery Address</h2>
+    <div>{{ order.full_name }}</div>
+    <div>{{ order.phone }}</div>
+    <div>{{ order.address_line1 }}</div>
+    {% if order.address_line2 %}
+      <div>{{ order.address_line2 }}</div>
+    {% endif %}
+    <div>{{ order.city }}, {{ order.state }} - {{ order.pincode }}</div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Items</h2>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Size</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>{{ item.product_name }}</td>
+              <td>
+                {% if item.size_label %}
+                  {{ item.size_label }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ item.quantity }}</td>
+              <td>₹{{ item.unit_price }}</td>
+              <td>₹{{ item.line_total }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="summary">
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>₹{{ order.subtotal }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span>₹{{ order.shipping_fee }}</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>₹{{ order.total }}</span>
+      </div>
+    </div>
+
+    {% if order.payment_method == 'MANUAL' %}
+      {% if order.status == 'PENDING_PAYMENT' or order.status == 'PAYMENT_SUBMITTED' %}
+        <a class="btn mt" href="{% url 'payments:manual_payment' order.id %}">
+          {% if order.status == 'PAYMENT_SUBMITTED' %}
+            Update Payment Details
+          {% else %}
+            Submit Payment
+          {% endif %}
+        </a>
+        {% if order.status == 'PAYMENT_SUBMITTED' %}
+          <div class="mt muted">Payment submitted. Waiting for verification.</div>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  </div>
+{% endblock %}

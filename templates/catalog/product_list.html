@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop - Shope in home{% endblock %}
+
+{% block content %}
+  <div class="category-chips">
+    <a class="chip {% if not selected_category %}active{% endif %}" href="{% url 'catalog:product_list' %}">All Categories</a>
+    {% for c in categories %}
+      <a class="chip {% if selected_category and selected_category.id == c.id %}active{% endif %}" href="{{ c.get_absolute_url }}">{{ c.name }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="layout shop-layout">
+    <aside class="sidebar">
+      <div class="sidebar-title">Filters</div>
+
+      <div class="filter-card">
+        <div class="filter-head">
+          <div class="filter-title">Categories</div>
+          <a class="filter-reset" href="{% url 'catalog:product_list' %}">Reset</a>
+        </div>
+
+        <ul class="category-list">
+          <li>
+            <a class="{% if not selected_category %}active{% endif %}" href="{% url 'catalog:product_list' %}">All</a>
+          </li>
+          {% for c in categories %}
+            <li>
+              <a class="{% if selected_category and selected_category.id == c.id %}active{% endif %}" href="{{ c.get_absolute_url }}">{{ c.name }}</a>
+            </li>
+          {% empty %}
+            <li class="muted">No categories yet</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="product-grid">
+        {% for p in products %}
+          <div class="card product-card">
+            <div class="product-fav" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.8 4.6c-1.5-1.6-4-1.6-5.5 0L12 7.9 8.7 4.6c-1.5-1.6-4-1.6-5.5 0-1.6 1.7-1.6 4.4 0 6.1L12 20l8.8-9.3c1.6-1.7 1.6-4.4 0-6.1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+
+            <a class="product-image" href="{{ p.get_absolute_url }}">
+              {% if p.image %}
+                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+              {% elif p.image2 %}
+                <img src="{{ p.image2.url }}" alt="{{ p.name }}">
+              {% elif p.image3 %}
+                <img src="{{ p.image3.url }}" alt="{{ p.name }}">
+              {% elif p.image4 %}
+                <img src="{{ p.image4.url }}" alt="{{ p.name }}">
+              {% else %}
+                <div class="image-placeholder">No image</div>
+              {% endif %}
+            </a>
+
+            <div class="product-body">
+              <a class="product-name" href="{{ p.get_absolute_url }}">{{ p.name }}</a>
+
+              <div class="product-actions">
+                <div class="price-pill">₹{{ p.selling_price }}</div>
+
+                <form class="product-cart-form" method="post" action="{% url 'cart:add' p.id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="btn btn-small">Add</button>
+                </form>
+              </div>
+
+              {% if p.original_price %}
+                <div class="mrp">₹{{ p.original_price }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <div class="muted">No products found.</div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+{% endblock %}

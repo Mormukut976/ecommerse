@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Shope in home{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">My Orders</h1>
+
+  {% if orders %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+            <tr>
+              <td>#{{ o.order_code }}</td>
+              <td>{{ o.get_status_display }}</td>
+              <td>₹{{ o.total }}</td>
+              <td>{{ o.created_at|date:"d M Y, H:i" }}</td>
+              <td>
+                <a class="link" href="{% url 'orders:order_detail' o.id %}">Track</a>
+                {% if o.payment_method == 'MANUAL' %}
+                  {% if o.status == 'PENDING_PAYMENT' or o.status == 'PAYMENT_SUBMITTED' %}
+                    <span class="muted">|</span>
+                    <a class="link" href="{% url 'payments:manual_payment' o.id %}">Submit UTR</a>
+                  {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="muted">No orders yet.</div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Manual Payment - Order #{{ order.order_code }} - Shope in home{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Manual Payment</h1>
+
+  <div class="order-meta card">
+    <div><strong>Order:</strong> #{{ order.order_code }}</div>
+    <div><strong>Total:</strong> ₹{{ order.total }}</div>
+    <div><strong>Status:</strong> {{ order.get_status_display }}</div>
+  </div>
+
+  <div class="layout checkout-layout">
+    <section class="content">
+      <h2 class="section-title">Submit Payment Details</h2>
+
+      {% if payment_method and payment_method.method_type == 'QR' %}
+        <div class="muted">Scan the QR shown on the right, then enter your UTR/Transaction ID below and confirm.</div>
+      {% else %}
+        <div class="muted">Pay to the UPI ID shown on the right, then enter your UTR/Transaction ID below and confirm.</div>
+      {% endif %}
+
+      <div class="card form-card">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn mt">Confirm Payment</button>
+        </form>
+      </div>
+
+      {% if payment and payment.manual_proof %}
+        <div class="mt">
+          <a class="link" href="{{ payment.manual_proof.url }}" target="_blank" rel="noopener noreferrer">View uploaded proof</a>
+        </div>
+      {% endif %}
+
+      <div class="mt">
+        <a class="link" href="{% url 'orders:order_detail' order.id %}">Back to Order</a>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="sidebar-title">Pay Using</div>
+
+      <div class="card">
+        {% if payment_method %}
+          <div class="summary-row">
+            <span>Option</span>
+            <span>{{ payment_method.name }}</span>
+          </div>
+
+          {% if payment_method.upi_id and payment_method.method_type != 'QR' %}
+            <div class="summary-row">
+              <span>UPI ID</span>
+              <span>{{ payment_method.upi_id }}</span>
+            </div>
+          {% endif %}
+
+          {% if payment_method.method_type == 'BANK' %}
+            {% if payment_method.account_name %}
+              <div class="summary-row">
+                <span>Account Name</span>
+                <span>{{ payment_method.account_name }}</span>
+              </div>
+            {% endif %}
+            {% if payment_method.account_number %}
+              <div class="summary-row">
+                <span>Account No.</span>
+                <span>{{ payment_method.account_number }}</span>
+              </div>
+            {% endif %}
+            {% if payment_method.ifsc_code %}
+              <div class="summary-row">
+                <span>IFSC</span>
+                <span>{{ payment_method.ifsc_code }}</span>
+              </div>
+            {% endif %}
+            {% if payment_method.bank_name %}
+              <div class="summary-row">
+                <span>Bank</span>
+                <span>{{ payment_method.bank_name }}</span>
+              </div>
+            {% endif %}
+          {% endif %}
+
+          {% if payment_method.qr_image %}
+            <div class="mt">
+              <img src="{{ payment_method.qr_image.url }}" alt="{{ payment_method.name }}" style="max-width: 100%; border-radius: 14px;">
+            </div>
+          {% elif qr_data_uri %}
+            <div class="mt">
+              <img src="{{ qr_data_uri }}" alt="{{ payment_method.name }}" style="max-width: 100%; border-radius: 14px;">
+            </div>
+          {% elif payment_method.method_type == 'QR' and upi_uri %}
+            <div class="mt">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data={{ upi_uri|urlencode }}" alt="{{ payment_method.name }}" style="max-width: 100%; border-radius: 14px;">
+            </div>
+          {% elif payment_method.method_type == 'QR' %}
+            <div class="mt muted">QR code unavailable.</div>
+          {% endif %}
+
+          {% if payment_method.instructions %}
+            <div class="mt muted">{{ payment_method.instructions|linebreaksbr }}</div>
+          {% endif %}
+        {% else %}
+          <div class="muted">No payment option selected.</div>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+{% endblock %}

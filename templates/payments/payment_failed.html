@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Failed - Shope in home{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Payment failed</h1>
+  <p class="muted">Your payment could not be verified. Please submit your payment details again.</p>
+
+  <div class="summary-actions mt">
+    <a class="btn" href="{% url 'payments:manual_payment' order.id %}">Submit UTR</a>
+    <a class="btn btn-outline" href="{% url 'orders:order_detail' order.id %}">Back to Order</a>
+  </div>
+{% endblock %}

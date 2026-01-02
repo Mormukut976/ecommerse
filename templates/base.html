@@ -1,0 +1,58 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Shope in home{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="{% url 'catalog:product_list' %}">Shope in home</a>
+
+        <form class="top-search" method="get" action="{% url 'catalog:product_list' %}">
+          <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}" aria-label="Search products">
+        </form>
+
+        <nav class="nav">
+          <a href="{% url 'catalog:product_list' %}">Shop</a>
+          <a href="{% url 'cart:detail' %}" class="cart-link">Cart{% if cart_item_count %} <span class="badge">{{ cart_item_count }}</span>{% endif %}</a>
+          <a href="{% url 'catalog:contact_us' %}">Contact</a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'orders:order_list' %}">My Orders</a>
+            {% if user.is_staff %}
+              <a href="{% url 'admin:index' %}">Admin</a>
+            {% endif %}
+            <a href="{% url 'accounts:logout' %}">Logout</a>
+          {% else %}
+            <a href="{% url 'accounts:login' %}">Login</a>
+            <a href="{% url 'accounts:register' %}">Register</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+
+  <main class="container main">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>Shope in home</div>
+        <div class="muted">Built with Django</div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

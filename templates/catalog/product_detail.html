@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Shope in home{% endblock %}
+
+{% block content %}
+  <div class="product-detail">
+    <div class="product-detail-image card">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% if product.image2 or product.image3 or product.image4 %}
+          <div class="product-gallery-thumbs mt">
+            {% if product.image2 %}<img src="{{ product.image2.url }}" alt="{{ product.name }}">{% endif %}
+            {% if product.image3 %}<img src="{{ product.image3.url }}" alt="{{ product.name }}">{% endif %}
+            {% if product.image4 %}<img src="{{ product.image4.url }}" alt="{{ product.name }}">{% endif %}
+          </div>
+        {% endif %}
+      {% elif product.image2 %}
+        <img src="{{ product.image2.url }}" alt="{{ product.name }}">
+        {% if product.image3 or product.image4 %}
+          <div class="product-gallery-thumbs mt">
+            {% if product.image3 %}<img src="{{ product.image3.url }}" alt="{{ product.name }}">{% endif %}
+            {% if product.image4 %}<img src="{{ product.image4.url }}" alt="{{ product.name }}">{% endif %}
+          </div>
+        {% endif %}
+      {% elif product.image3 %}
+        <img src="{{ product.image3.url }}" alt="{{ product.name }}">
+        {% if product.image4 %}
+          <div class="product-gallery-thumbs mt">
+            <img src="{{ product.image4.url }}" alt="{{ product.name }}">
+          </div>
+        {% endif %}
+      {% elif product.image4 %}
+        <img src="{{ product.image4.url }}" alt="{{ product.name }}">
+      {% else %}
+        <div class="image-placeholder large">No image</div>
+      {% endif %}
+    </div>
+
+    <div class="product-detail-info">
+      <h1 class="page-title">{{ product.name }}</h1>
+
+      <div class="price-row">
+        <div class="price">₹{{ product.selling_price }}</div>
+        {% if product.original_price %}
+          <div class="mrp">₹{{ product.original_price }}</div>
+        {% endif %}
+      </div>
+
+      {% if product.description %}
+        <p class="muted">{{ product.description }}</p>
+      {% endif %}
+
+      <div class="card form-card">
+        <form method="post" action="{% url 'cart:add' product.id %}">
+          {% csrf_token %}
+          {% if sizes %}
+            <label>Size</label>
+            <select name="size_id">
+              {% for s in sizes %}
+                <option value="{{ s.id }}">{{ s.label }}</option>
+              {% endfor %}
+            </select>
+          {% endif %}
+          <label>Quantity</label>
+          <input type="number" name="quantity" value="1" min="1">
+          <button type="submit" class="btn mt">Add to Cart</button>
+        </form>
+      </div>
+
+      <a class="link" href="{% url 'cart:detail' %}">Go to Cart</a>
+    </div>
+  </div>
+
+  <div class="mt">
+    <h2 class="section-title">Customer Reviews</h2>
+
+    {% if reviews %}
+      {% for r in reviews %}
+        <div class="card mt">
+          <div class="summary-row">
+            <span><strong>{% if r.user %}{{ r.user.username }}{% elif r.name %}{{ r.name }}{% else %}Customer{% endif %}</strong></span>
+            <span>{{ r.rating }}/5</span>
+          </div>
+          {% if r.comment %}
+            <div class="muted">{{ r.comment|linebreaksbr }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="card muted">No reviews yet.</div>
+    {% endif %}
+
+    <div class="mt">
+      <h2 class="section-title">Write a Review</h2>
+      <div class="card form-card">
+        <form method="post" action="{% url 'catalog:product_review_create' product.slug %}">
+          {% csrf_token %}
+          {{ review_form.as_p }}
+          <button type="submit" class="btn mt">Submit Review</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

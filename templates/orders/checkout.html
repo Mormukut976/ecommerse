@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - Shope in home{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Checkout</h1>
+
+  <div class="layout checkout-layout">
+    <section class="content">
+      <h2 class="section-title">Delivery Details</h2>
+
+      <div class="card form-card">
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn mt" id="checkout-submit">Proceed to UPI/Bank</button>
+        </form>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="sidebar-title">Order Summary</div>
+      <div class="card">
+        {% for item in items %}
+          <div class="summary-row">
+            <span>
+              {{ item.product.name }}
+              {% if item.size %} ({{ item.size.label }}){% endif %}
+              x {{ item.quantity }}
+            </span>
+            <span>₹{{ item.line_total }}</span>
+          </div>
+        {% endfor %}
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>₹{{ subtotal }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span>₹{{ shipping_fee }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>₹{{ total }}</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+{% endblock %}

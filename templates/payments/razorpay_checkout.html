@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - Shope in home{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Payment</h1>
+
+  <div class="card">
+    <p class="muted">Online payment is not available. Please use manual payment to complete this order.</p>
+
+    <div class="summary-actions mt">
+      <a class="btn" href="{% url 'payments:manual_payment' order.id %}">Submit UTR</a>
+      <a class="btn btn-outline" href="{% url 'orders:order_detail' order.id %}">Back to Order</a>
+    </div>
+  </div>
+{% endblock %}

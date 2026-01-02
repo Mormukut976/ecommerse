@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - Shope in home{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Contact Us</h1>
+
+  <div class="layout checkout-layout">
+    <section class="content">
+      <div class="card form-card">
+        <h2 class="section-title">Send us a message</h2>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn mt">Send Message</button>
+        </form>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="sidebar-title">Contact</div>
+      <div class="card">
+        <div class="summary-row">
+          <span>Email</span>
+          <span><a class="link" href="mailto:{{ contact_email }}">{{ contact_email }}</a></span>
+        </div>
+        {% if whatsapp_qr_url %}
+          <div class="summary-row mt">
+            <span>WhatsApp</span>
+            <span>
+              {% if whatsapp_chat_url %}
+                <a class="link" href="{{ whatsapp_chat_url }}" target="_blank" rel="noopener noreferrer">Open Chat</a>
+              {% else %}
+                Scan QR
+              {% endif %}
+            </span>
+          </div>
+          <div class="contact-qr">
+            {% if whatsapp_chat_url %}
+              <a href="{{ whatsapp_chat_url }}" target="_blank" rel="noopener noreferrer">
+                <img src="{{ whatsapp_qr_url }}" alt="WhatsApp QR">
+              </a>
+            {% else %}
+              <img src="{{ whatsapp_qr_url }}" alt="WhatsApp QR">
+            {% endif %}
+          </div>
+        {% endif %}
+        <div class="mt muted">
+          You can raise a delivery complaint or any other issue using the form.
+        </div>
+      </div>
+    </aside>
+  </div>
+{% endblock %}

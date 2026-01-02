@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Setup - Shope in home{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Payment not configured</h1>
+  <p class="muted">No manual payment options are configured. Please contact support.</p>
+  <a class="btn mt" href="{% url 'orders:order_detail' order.id %}">Back to Order</a>
+{% endblock %}
