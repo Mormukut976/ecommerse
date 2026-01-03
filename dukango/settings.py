@@ -99,6 +99,8 @@ STORAGES = {
     'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
 
+WHITENOISE_MANIFEST_STRICT = False
+
 if CLOUDINARY_URL:
     CLOUDINARY_STORAGE = {'CLOUDINARY_URL': CLOUDINARY_URL}
     STORAGES['default'] = {'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage'}
