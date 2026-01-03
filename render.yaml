@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: dukango-store
+    env: python
+    plan: free
+    autoDeploy: true
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: |
+      bash render_start.sh
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "*"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dukango-db
+          property: connectionString
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: DJANGO_EMAIL_HOST
+        sync: false
+      - key: DJANGO_EMAIL_PORT
+        value: "587"
+      - key: DJANGO_EMAIL_USE_TLS
+        value: "1"
+      - key: DJANGO_EMAIL_HOST_USER
+        sync: false
+      - key: DJANGO_EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DJANGO_DEFAULT_FROM_EMAIL
+        sync: false
+      - key: DJANGO_CONTACT_TO_EMAIL
+        value: "tredarssr@gmail.com"
+      - key: DJANGO_WHATSAPP_QR_STATIC_PATH
+        value: "https://res.cloudinary.com/dtz8e4zv3/image/upload/v1767353341/WhatsApp_Image_2026-01-02_at_15.52.47_sbksox.jpg"
+      - key: DJANGO_WHATSAPP_CHAT_URL
+        sync: false
+
+databases:
+  - name: dukango-db
+    plan: free
