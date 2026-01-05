@@ -531,7 +531,7 @@ body.no-scroll {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 14px;
 }
 
@@ -1092,7 +1092,12 @@ body.no-scroll {
   }
 
   .product-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .product-image img {
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.9);
   }
 
   .product-detail {
