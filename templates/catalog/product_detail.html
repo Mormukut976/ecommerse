@@ -5,32 +5,169 @@
 {% block content %}
   <div class="product-detail">
     <div class="product-detail-image card">
-      {% if product.image %}
-        <img src="{{ product.image.url }}" alt="{{ product.name }}">
-        {% if product.image2 or product.image3 or product.image4 %}
-          <div class="product-gallery-thumbs mt">
-            {% if product.image2 %}<img src="{{ product.image2.url }}" alt="{{ product.name }}">{% endif %}
-            {% if product.image3 %}<img src="{{ product.image3.url }}" alt="{{ product.name }}">{% endif %}
-            {% if product.image4 %}<img src="{{ product.image4.url }}" alt="{{ product.name }}">{% endif %}
+      {% if gallery_images %}
+        <div class="product-gallery" id="productGallery">
+          <div class="product-gallery-thumbs">
+            {% for img in gallery_images %}
+              <button type="button" class="product-thumb{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.counter0 }}" data-full="{{ img.url }}" aria-label="View image {{ forloop.counter }}">
+                <img src="{{ img.url }}" alt="{{ product.name }}">
+              </button>
+            {% endfor %}
           </div>
-        {% endif %}
-      {% elif product.image2 %}
-        <img src="{{ product.image2.url }}" alt="{{ product.name }}">
-        {% if product.image3 or product.image4 %}
-          <div class="product-gallery-thumbs mt">
-            {% if product.image3 %}<img src="{{ product.image3.url }}" alt="{{ product.name }}">{% endif %}
-            {% if product.image4 %}<img src="{{ product.image4.url }}" alt="{{ product.name }}">{% endif %}
+
+          <div class="product-gallery-main">
+            <button type="button" class="gallery-nav gallery-nav-prev" aria-label="Previous image"><span>‹</span></button>
+            <button type="button" class="gallery-nav gallery-nav-next" aria-label="Next image"><span>›</span></button>
+            <img id="productMainImage" class="product-main-image" src="{{ gallery_images.0.url }}" alt="{{ product.name }}" tabindex="0">
           </div>
-        {% endif %}
-      {% elif product.image3 %}
-        <img src="{{ product.image3.url }}" alt="{{ product.name }}">
-        {% if product.image4 %}
-          <div class="product-gallery-thumbs mt">
-            <img src="{{ product.image4.url }}" alt="{{ product.name }}">
+        </div>
+
+        <div class="lightbox" id="productLightbox" role="dialog" aria-modal="true" aria-label="Product images">
+          <div class="lightbox-panel" role="document">
+            <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close"><span>×</span></button>
+            <div class="lightbox-body">
+              <div class="product-gallery" id="productLightboxGallery">
+                <div class="product-gallery-thumbs">
+                  {% for img in gallery_images %}
+                    <button type="button" class="product-thumb{% if forloop.first %} is-active{% endif %}" data-index="{{ forloop.counter0 }}" data-full="{{ img.url }}" aria-label="View image {{ forloop.counter }}">
+                      <img src="{{ img.url }}" alt="{{ product.name }}">
+                    </button>
+                  {% endfor %}
+                </div>
+
+                <div class="product-gallery-main">
+                  <button type="button" class="gallery-nav gallery-nav-prev" aria-label="Previous image"><span>‹</span></button>
+                  <button type="button" class="gallery-nav gallery-nav-next" aria-label="Next image"><span>›</span></button>
+                  <img id="lightboxMainImage" src="{{ gallery_images.0.url }}" alt="{{ product.name }}">
+                </div>
+              </div>
+            </div>
           </div>
-        {% endif %}
-      {% elif product.image4 %}
-        <img src="{{ product.image4.url }}" alt="{{ product.name }}">
+        </div>
+
+        <script>
+          (function () {
+            var gallery = document.getElementById('productGallery');
+            var main = document.getElementById('productMainImage');
+            if (!gallery || !main) return;
+
+            var lightbox = document.getElementById('productLightbox');
+            var lightboxGallery = document.getElementById('productLightboxGallery');
+            var lightboxMain = document.getElementById('lightboxMainImage');
+            var lightboxClose = document.getElementById('lightboxClose');
+
+            var pageThumbs = Array.prototype.slice.call(gallery.querySelectorAll('.product-thumb'));
+            if (!pageThumbs.length) return;
+
+            var urls = pageThumbs
+              .map(function (btn) {
+                return btn.getAttribute('data-full');
+              })
+              .filter(Boolean);
+
+            var index = 0;
+
+            function setActive(container, idx) {
+              if (!container) return;
+              var thumbs = container.querySelectorAll('.product-thumb');
+              if (!thumbs || !thumbs.length) return;
+
+              thumbs.forEach(function (btn) {
+                var bi = parseInt(btn.getAttribute('data-index') || '0', 10);
+                if (bi === idx) {
+                  btn.classList.add('is-active');
+                } else {
+                  btn.classList.remove('is-active');
+                }
+              });
+            }
+
+            function setIndex(next) {
+              if (!urls.length) return;
+              if (next < 0) next = urls.length - 1;
+              if (next >= urls.length) next = 0;
+              index = next;
+
+              var url = urls[index];
+              if (url) main.src = url;
+              if (lightbox && lightboxMain && url) lightboxMain.src = url;
+
+              setActive(gallery, index);
+              setActive(lightboxGallery, index);
+            }
+
+            function bindThumbs(container) {
+              if (!container) return;
+              var thumbs = container.querySelectorAll('.product-thumb');
+              if (!thumbs || !thumbs.length) return;
+
+              thumbs.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                  var idx = parseInt(btn.getAttribute('data-index') || '0', 10);
+                  setIndex(idx);
+                });
+              });
+            }
+
+            function bindNav(container) {
+              if (!container) return;
+              var prev = container.querySelector('.gallery-nav-prev');
+              var next = container.querySelector('.gallery-nav-next');
+
+              if (prev) prev.addEventListener('click', function () { setIndex(index - 1); });
+              if (next) next.addEventListener('click', function () { setIndex(index + 1); });
+
+              if (urls.length <= 1) {
+                if (prev) prev.style.display = 'none';
+                if (next) next.style.display = 'none';
+              }
+            }
+
+            function openLightbox() {
+              if (!lightbox) return;
+              lightbox.classList.add('is-open');
+              document.body.classList.add('no-scroll');
+              setIndex(index);
+              if (lightboxClose) lightboxClose.focus();
+            }
+
+            function closeLightbox() {
+              if (!lightbox) return;
+              lightbox.classList.remove('is-open');
+              document.body.classList.remove('no-scroll');
+              main.focus();
+            }
+
+            bindThumbs(gallery);
+            bindNav(gallery);
+            bindThumbs(lightboxGallery);
+            bindNav(lightboxGallery);
+
+            main.addEventListener('click', openLightbox);
+            main.addEventListener('keydown', function (e) {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openLightbox();
+              }
+            });
+
+            if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+            if (lightbox) {
+              lightbox.addEventListener('click', function (e) {
+                if (e.target === lightbox) closeLightbox();
+              });
+            }
+
+            document.addEventListener('keydown', function (e) {
+              if (!lightbox || !lightbox.classList.contains('is-open')) return;
+              if (e.key === 'Escape') closeLightbox();
+              if (e.key === 'ArrowLeft') setIndex(index - 1);
+              if (e.key === 'ArrowRight') setIndex(index + 1);
+            });
+
+            setIndex(0);
+          })();
+        </script>
       {% else %}
         <div class="image-placeholder large">No image</div>
       {% endif %}

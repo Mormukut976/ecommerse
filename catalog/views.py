@@ -51,6 +51,7 @@ def product_detail(request, slug):
         slug=slug,
         is_active=True,
     )
+    gallery_images = [img for img in [product.image, product.image2, product.image3, product.image4] if img]
     return render(
         request,
         'catalog/product_detail.html',
@@ -59,6 +60,7 @@ def product_detail(request, slug):
             'sizes': product.active_sizes,
             'reviews': getattr(product, 'active_reviews', []),
             'review_form': ProductReviewForm(),
+            'gallery_images': gallery_images,
         },
     )
 
@@ -77,6 +79,7 @@ def product_review_create(request, slug):
         slug=slug,
         is_active=True,
     )
+    gallery_images = [img for img in [product.image, product.image2, product.image3, product.image4] if img]
 
     form = ProductReviewForm(request.POST)
     if form.is_valid():
@@ -108,6 +111,7 @@ def product_review_create(request, slug):
             'sizes': product.active_sizes,
             'reviews': getattr(product, 'active_reviews', []),
             'review_form': form,
+            'gallery_images': gallery_images,
         },
     )
 

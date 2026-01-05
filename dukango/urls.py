@@ -3,8 +3,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-admin.site.site_header = 'Dukango Store Admin'
-admin.site.site_title = 'Dukango Admin'
+admin.site.site_header = 'Shope in home Admin'
+admin.site.site_title = 'Shope in home Admin'
 admin.site.index_title = 'Dashboard'
 admin.site.enable_nav_sidebar = False
 
