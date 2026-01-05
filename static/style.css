@@ -1080,9 +1080,14 @@ body.no-scroll {
 
   .layout {
     flex-direction: column;
+    align-items: stretch;
   }
 
   .sidebar {
+    width: 100%;
+  }
+
+  .content {
     width: 100%;
   }
 
