@@ -27,21 +27,25 @@
  }
 
  .app-shell {
-   max-width: 1240px;
-   margin: 22px auto;
-   border-radius: 28px;
+   max-width: none;
+   margin: 0;
+   border-radius: 0;
    background: rgba(255, 255, 255, 0.72);
-   border: 1px solid rgba(255, 255, 255, 0.55);
+   border: 0;
    box-shadow: 0 42px 90px rgba(76, 29, 149, 0.24);
    backdrop-filter: blur(14px);
    overflow: hidden;
  }
 
  .container {
-  max-width: 1180px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   padding: 16px;
  }
+
+body.no-scroll {
+  overflow: hidden;
+}
 
  .site-header {
    position: relative;
@@ -671,6 +675,113 @@
 .product-gallery-main {
   grid-area: main;
   min-width: 0;
+  position: relative;
+}
+
+.product-main-image {
+  cursor: zoom-in;
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.92);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.10);
+}
+
+.gallery-nav:hover {
+  background: #fff;
+}
+
+.gallery-nav-prev {
+  left: 10px;
+}
+
+.gallery-nav-next {
+  right: 10px;
+}
+
+.gallery-nav span {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--text);
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.75);
+  padding: 18px;
+  z-index: 200;
+}
+
+.lightbox.is-open {
+  display: flex;
+}
+
+.lightbox-panel {
+  width: 100%;
+  max-width: 1200px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.lightbox-body {
+  padding: 14px;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.95);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.lightbox-close span {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.lightbox .product-gallery {
+  grid-template-columns: 110px 1fr;
+}
+
+.lightbox .product-gallery-thumbs {
+  max-height: 80vh;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.lightbox .product-gallery-main img {
+  width: 100%;
+  height: min(80vh, 760px);
+  object-fit: contain;
+  border-radius: 12px;
+  background: #fff;
 }
 
 .product-thumb {
