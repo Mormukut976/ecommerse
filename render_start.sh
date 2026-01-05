@@ -1,7 +1,20 @@
 #!/usr/bin/env bash
 set -e
 
-python manage.py migrate
+echo "Running database migrations..."
+for i in {1..10}; do
+    if python manage.py migrate --noinput; then
+        break
+    fi
+
+    if [ "$i" -eq 10 ]; then
+        echo "Migrations failed after ${i} attempts. Exiting."
+        exit 1
+    fi
+
+    echo "Migrations failed (attempt ${i}/10). Retrying in 5s..."
+    sleep 5
+done
 
 python - <<'PY'
 import os
@@ -41,4 +54,5 @@ if username:
         user.save()
 PY
 
-gunicorn dukango.wsgi:application --bind 0.0.0.0:${PORT:-8000}
+echo "Starting gunicorn..."
+exec gunicorn dukango.wsgi:application --bind 0.0.0.0:${PORT:-8000}
